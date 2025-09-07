@@ -18,7 +18,16 @@ from django.contrib import admin
 from django.urls import path, include
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('api/accounts/auth/', include('dj_rest_auth.urls')),
-    path('api/accounts/auth/registration/', include('dj_rest_auth.registration.urls')),
+    path("admin/", admin.site.urls),
+
+    # dj-rest-auth (login/logout/password)
+    path("api/accounts/auth/", include("dj_rest_auth.urls")),
+
+    # Registration (manual email/password)
+    path("api/accounts/auth/registration/", include("dj_rest_auth.registration.urls")),
+    path("accounts/", include("allauth.urls")),
+
+    # If you want your own profile endpoints
+    path("api/accounts/", include("accounts.urls")),  # custom app endpoints
 ]
+
