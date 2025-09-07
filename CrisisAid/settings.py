@@ -11,6 +11,9 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import environ
+env = environ.Env()
+environ.Env.read_env()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -27,6 +30,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+AUTH_USER_MODEL = "accounts.CustomUser"
+
 
 # Application definition
 
@@ -37,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    "django.contrib.sites",
     
     # REST framework
     'rest_framework',
@@ -87,6 +93,34 @@ TEMPLATES = [
         },
     },
 ]
+
+#Social login settings
+
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'APP': {
+            'client_id': env("GOOGLE_CLIENT_ID"),
+            'secret': env("GOOGLE_CLIENT_SECRET"),
+        },
+        'SCOPE': ['profile','email',],
+         'AUTH_PARAMS': {'access_type': 'online'},
+        'METHOD': 'oauth2',
+        'VERIFIED_EMAIL': True,
+    },
+    'github': {
+        'APP': {
+            'client_id': env("GITHUB_CLIENT_ID"),
+            'secret': env("GITHUB_CLIENT_SECRET"),
+        }
+    }
+   
+}
+
+SOCIALACCOUNT_LOGIN_ON_GET=True
+LOGIN_REDIRECT_URL = 'success'
+LOGIN_URL = 'login'
+SOCIALACCOUNT_AUTO_SIGNUP = True
+
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
@@ -160,12 +194,36 @@ AUTHENTICATION_BACKENDS = [
     'allauth.account.auth_backends.AuthenticationBackend',       # Allauth
 ]
 
+
 SITE_ID = 1
+
+# Redirects
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
-# Allauth account settings (dev-friendly defaults)
-ACCOUNT_AUTHENTICATION_METHOD = 'username_email'
-ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_EMAIL_VERIFICATION = 'none'   # use 'mandatory' in production with email setup
-ACCOUNT_USERNAME_REQUIRED = True
+# Login methods (instead of ACCOUNT_AUTHENTICATION_METHOD)
+ACCOUNT_LOGIN_METHODS = {"email", "username"}  # allow both
+ACCOUNT_SIGNUP_FIELDS = ["email*", "username*", "password1*", "password2*"]
+
+# Mandatory verification
+ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+SOCIALACCOUNT_EMAIL_VERIFICATION = "mandatory"
+
+# Rate limiting (instead of ACCOUNT_LOGIN_ATTEMPTS_LIMIT)
+ACCOUNT_RATE_LIMITS = {
+    "login_failed": "5/300s",  # 5 attempts per 5 minutes
+}
+
+ACCOUNT_ADAPTER = "accounts.adapter.CustomAccountAdapter"
+SOCIALACCOUNT_ADAPTER = "accounts.adapter.CustomSocialAccountAdapter"
+FRONTEND_URL = "http://localhost:3000"  # React frontend
+
+# Email backend config (using Gmail App Password in .env)
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = env("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD")
+
+
