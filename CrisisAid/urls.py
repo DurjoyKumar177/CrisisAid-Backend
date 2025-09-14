@@ -24,7 +24,7 @@ urlpatterns = [
     path("api/accounts/auth/", include("dj_rest_auth.urls")),
 
     # Registration (manual email/password)
-    path("api/accounts/auth/registration/", include("dj_rest_auth.registration.urls")),
+    path("api/accounts/auth/signup/", include("dj_rest_auth.registration.urls")),
     path("accounts/", include("allauth.urls")),
 
     # If you want your own profile endpoints
