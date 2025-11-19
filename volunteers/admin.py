@@ -4,25 +4,26 @@ from .models import VolunteerApplication
 
 @admin.register(VolunteerApplication)
 class VolunteerApplicationAdmin(admin.ModelAdmin):
-    # Columns to show
     list_display = ("id", "user_name", "crisis_title", "colored_status", "applied_at")
-    
-    # Filters on sidebar
     list_filter = ("status", "crisis_post", "applied_at")
-    
-    # Search by username or post title
-    search_fields = ("user__username", "crisis_post__title")
-    
-    # Ordering (latest first)
+    search_fields = ("user__username", "crisis_post__title", "message")
     ordering = ("-applied_at",)
-    
-    # Make applied_at read-only
     readonly_fields = ("applied_at",)
-    
-    # Optional: clickable link to user or crisis post
     list_display_links = ("user_name", "crisis_title")
     
-    # Custom display methods
+    # NEW: Bulk actions
+    actions = ['approve_applications', 'reject_applications']
+    
+    def approve_applications(self, request, queryset):
+        updated = queryset.update(status='approved')
+        self.message_user(request, f'{updated} application(s) approved.')
+    approve_applications.short_description = 'Approve selected applications'
+    
+    def reject_applications(self, request, queryset):
+        updated = queryset.update(status='rejected')
+        self.message_user(request, f'{updated} application(s) rejected.')
+    reject_applications.short_description = 'Reject selected applications'
+    
     def user_name(self, obj):
         return obj.user.username
     user_name.short_description = "Volunteer"
