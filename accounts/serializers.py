@@ -14,9 +14,18 @@ class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = [
-            "email", "password", "confirm_password",
-            "first_name", "last_name", "phone",
-            "profile_picture", "facebook_account", "location", "occupation"
+            "username",
+            "email",
+            "password",
+            "confirm_password",
+            "first_name",
+            "last_name",
+            "phone",
+            "profile_picture",
+            "facebook_account",
+            "location",
+            "occupation",
+            "role",  # include role
         ]
 
     def validate(self, data):
@@ -26,16 +35,20 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         validated_data.pop("confirm_password")
+        role = validated_data.pop("role", "user")  # default user
         user = User(**validated_data)
         user.set_password(validated_data["password"])
-        user.is_active = False  # inactive until email verified
+        user.is_active = False  # inactive until email verification
+        user.role = role
         user.save()
 
-        # Send email confirmation via allauth
+        # Email confirmation
         request = self.context.get("request")
         adapter = get_adapter()
         setup_user_email(request, user, [])
-        adapter.send_confirmation_mail(request, user.emailaddress_set.get(), True)
+        email_address = user.emailaddress_set.first()
+        if email_address:
+            adapter.send_confirmation_mail(request, email_address, True)
 
         return user
 

@@ -12,6 +12,10 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import environ
+import warnings
+
+warnings.filterwarnings('ignore', module='dj_rest_auth')
+
 env = environ.Env()
 environ.Env.read_env()
 
@@ -54,6 +58,10 @@ INSTALLED_APPS = [
     #my apps
     'core',
     'accounts',
+    'crisis',
+    'donations',
+    'updates',
+    'volunteers',
     
     # Allauth
     'allauth',
@@ -227,3 +235,8 @@ EMAIL_HOST_USER = env("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD")
 
 
+import os
+
+# Media files (uploaded images)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
