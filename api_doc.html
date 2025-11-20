@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CrisisAID API Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .base-url {
+            background: #f8f9fa;
+            padding: 20px;
+            border-bottom: 3px solid #667eea;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .base-url code {
+            background: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 1.1em;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-size: 1.8em;
+            color: #667eea;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+            display: flex;
+            align-items: center;
+        }
+
+        .section-title::before {
+            content: "📡";
+            margin-right: 10px;
+            font-size: 1.2em;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.95em;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        tbody tr:hover {
+            background: #f8f9fa;
+            transition: all 0.3s;
+        }
+
+        .method {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.85em;
+            min-width: 70px;
+            text-align: center;
+        }
+
+        .method.get {
+            background: #28a745;
+            color: white;
+        }
+
+        .method.post {
+            background: #007bff;
+            color: white;
+        }
+
+        .method.put {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .method.delete {
+            background: #dc3545;
+            color: white;
+        }
+
+        .endpoint {
+            font-family: 'Courier New', monospace;
+            color: #667eea;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+
+        .auth-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+
+        .auth-required {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .auth-public {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .auth-admin {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .copy-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.85em;
+            transition: all 0.3s;
+        }
+
+        .copy-btn:hover {
+            background: #764ba2;
+            transform: scale(1.05);
+        }
+
+        .copy-btn:active {
+            transform: scale(0.95);
+        }
+
+        .test-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.85em;
+            margin-left: 5px;
+            transition: all 0.3s;
+        }
+
+        .test-btn:hover {
+            background: #218838;
+            transform: scale(1.05);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 5px;
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #28a745;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .description {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .search-box {
+            margin-bottom: 30px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            font-size: 1em;
+            outline: none;
+        }
+
+        .search-box input:focus {
+            border-color: #764ba2;
+            box-shadow: 0 0 10px rgba(102, 126, 234, 0.3);
+        }
+
+        .stats {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            flex: 1;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-card h3 {
+            font-size: 2em;
+            margin-bottom: 5px;
+        }
+
+        .stat-card p {
+            opacity: 0.9;
+            font-size: 0.9em;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+            }
+
+            table {
+                font-size: 0.85em;
+            }
+
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .stats {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚨 CrisisAID API Documentation</h1>
+            <p>Complete RESTful API Reference for Crisis Management Platform</p>
+        </div>
+
+        <div class="base-url">
+            <div>
+                <strong>Base URL:</strong> 
+                <code id="baseUrl">http://127.0.0.1:8000</code>
+            </div>
+            <button class="copy-btn" onclick="copyText('baseUrl')">Copy Base URL</button>
+        </div>
+
+        <div class="content">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="🔍 Search APIs by endpoint, method, or description..." onkeyup="searchAPI()">
+            </div>
+
+            <div class="stats">
+                <div class="stat-card">
+                    <h3 id="totalEndpoints">42</h3>
+                    <p>Total Endpoints</p>
+                </div>
+                <div class="stat-card">
+                    <h3>5</h3>
+                    <p>API Modules</p>
+                </div>
+                <div class="stat-card">
+                    <h3>REST</h3>
+                    <p>Architecture</p>
+                </div>
+            </div>
+
+            <!-- AUTHENTICATION APIS -->
+            <div class="section">
+                <h2 class="section-title">Authentication APIs</h2>
+                <table id="authTable">
+                    <thead>
+                        <tr>
+                            <th style="width: 10%">Method</th>
+                            <th style="width: 35%">Endpoint</th>
+                            <th style="width: 30%">Description</th>
+                            <th style="width: 12%">Auth</th>
+                            <th style="width: 13%">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="method post">POST</span></td>
+                            <td><span class="endpoint">/api/accounts/auth/signup/</span></td>
+                            <td class="description">Register new user account</td>
+                            <td><span class="auth-badge auth-public">Public</span></td>
+                            <td>
+                                <div class="btn-group">
+                                    <button class="copy-btn" onclick="copyEndpoint('/api/accounts/auth/signup/')">Copy</button>
+                                    <button class="test-btn" onclick="testEndpoint('/api/accounts/auth/signup/', 'POST')">Test</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><span class="method post">POST</span></td>
+                            <td><span class="endpoint">/api/accounts/auth/login/</span></td>
+                            <td class="description">Login and get authentication token</td>
+                            <td><span class="auth-badge auth-public">Public</span></td>
+                            <td>
+                                <div class="btn-group">
+                                    <button class="copy-btn" onclick="copyEndpoint('/api/accounts/auth/login/')">Copy</button>
+                                    <button class="test-btn" onclick="testEndpoint('/api/accounts/auth/login/', 'POST')">Test</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><span class="method post">POST</span></td>
+                            <td><span class="endpoint">/api/accounts/auth/logout/</span></td>
+                            <td class="description">Logout current user</td>
+                            <td><span class="auth-badge auth-required">Auth Required</span></td>
+                            <td>
+                                <div class="btn-group">
+                                    <button class="copy-btn" onclick="copyEndpoint('/api/accounts/auth/logout/')">Copy</button>
+                                    <button class="test-btn" onclick="testEndpoint('/api/accounts/auth/logout/', 'POST')">Test</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><span class="method get">GET</span></td>
+                            <td><span class="endpoint">/api/accounts/auth/user/</span></td>
+                            <td class="description">Get current authenticated user info</td>
+                            <td><span class="auth-badge auth-required">Auth Required</span></td>
+                            <td>
+                                <div class="btn-group">
+                                    <button class="copy-btn" onclick="copyEndpoint('/api/accounts/auth/user/')">Copy</button>
+                                    <button class="test-btn" onclick="testEndpoint('/api/accounts/auth/user/', 'GET')">Test</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><span class="method get">GET</span></td>
+                            <td><span class="endpoint">/accounts/google/login/</span></td>
+                            <td class="description">Google OAuth login</td>
+                            <td><span class="auth-badge auth-public">Public</span></td>
+                            <td>
+                                <div class="btn-group">
+                                    <button class="copy-btn" onclick="copyEndpoint('/accounts/google/login/')">Copy</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><span class="method get">GET</span></td>
+                            <td><span class="endpoint">/accounts/github/login/</span></td>
+                            <td class="description">GitHub OAuth login</td>
+                            <td><span class="auth-badge auth-public">Public</span></td>
+                            <td>
+                                <div class="btn-group">
+                                    <button class="copy-btn" onclick="copyEndpoint('/accounts/github/login/')">Copy</button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- CRISIS APIS -->
+            <div class="section">
+                <h2 class="section-title">Crisis Management APIs</h2>
+                <table id="crisisTable">
+                    <thead>
+                        <tr>
+                            <th style="width: 10%">Method</th>
+                            <th style="width: 35%">Endpoint</th>
+                            <th style="width: 30%">Description</th>
+                            <th style="width: 12%">Auth</th>
+                            <th style="width: 13%">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="method get">GET</span></td>
+                            <td><span class="endpoint">/api/crisis/posts/</span></td>
+                            <td class="description">List all approved crisis posts</td>
+                            <td><span class="auth-badge auth-public">Public</span></td>
+                            <td>
+                                <div class="btn-group">
+                                    <button class="copy-btn" onclick="copyEndpoint('/api/crisis/posts/')">Copy</button>
+                                    <button class="test-btn" onclick="testEndpoint('/api/crisis/posts/', 'GET')">Test</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><span class="method get">GET</span></td>
+                            <td><span class="endpoint">/api/crisis/posts/?post_type=national</span></td>
+                            <td class="description">Filter posts by type (national/district/individual)</td>
+                            <td><span class="auth-badge auth-public">Public</span></td>
+                            <td>
+                                <div class="btn-group">
+                                    <button class="copy-btn" onclick="copyEndpoint('/api/crisis/posts/?post_type=national')">Copy</button>
+                                    <button class="test-btn" onclick="testEndpoint('/api/crisis/posts/?post_type=national', 'GET')">Test</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><span class="method get">GET</span></td>
+                            <td><span class="endpoint">/api/crisis/posts/?status=pending</span></td>
+                            <td class="description">Filter posts by status (admin only)</td>
+                            <td><span class="auth-badge auth-admin">Admin Only</span></td>
+                            <td>
+                                <div class="btn-group">
+                                    <button class="copy-btn" onclick="copyEndpoint('/api/crisis/posts/?status=pending')">Copy</button>
+                                    <button class="test-btn" onclick="testEndpoint('/api/crisis/posts/?status=pending', 'GET')">Test</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><span class="method get">GET</span></td>
+                            <td><span class="endpoint">/api/crisis/posts/{id}/</span></td>
+                            <td class="description">Get single crisis post details</td>
+                            <td><span class="auth-badge auth-public">Public</span></td>
+                            <td>
+                                <div class="btn-group">
+                                    <button class="copy-btn" onclick="copyEndpoint('/api/crisis/posts/1/')">Copy</button>
+                                    <button class="test-btn" onclick="testEndpoint('/api/crisis/posts/1/', 'GET')">Test</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><span class="method post">POST</span></td>
+                            <td><span class="endpoint">/api/crisis/posts/</span></td>
+                            <td class="description">Create new crisis post</td>
+                            <td><span class="auth-badge auth-required">Auth Required</span></td>
+                            <td>
+                                <div class="btn-group">
+                                    <button class="copy-btn" onclick="copyEndpoint('/api/crisis/posts/')">Copy</button>
+                                    <button class="test-btn" onclick="testEndpoint('/api/crisis/posts/', 'POST')">Test</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><span class="method put">PUT</span></td>
+                            <td><span class="endpoint">/api/crisis/posts/{id}/</span></td>
+                            <td class="description">Update crisis post (owner only)</td>
+                            <td><span class="auth-badge auth-required">Auth Required</span></td>
+                            <td>
+                                <div class="btn-group">
+                                    <button class="copy-btn" onclick="copyEndpoint('/api/crisis/posts/1/')">Copy</button>
+                                    <button class="test-btn" onclick="testEndpoint('/api/crisis/posts/1/', 'PUT')">Test</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><span class="method delete">DELETE</span></td>
+                            <td><span class="endpoint">/api/crisis/posts/{id}/</span></td>
+                            <td class="description">Delete crisis post (owner only)</td>
+                            <td><span class="auth-badge auth-required">Auth Required</span></td>
+                            <td>
+                                <div class="btn-group">
+                                    <button class="copy-btn" onclick="copyEndpoint('/api/crisis/posts/1/')">Copy</button>
+                                    <button class="test-btn" onclick="testEndpoint('/api/crisis/posts/1/', 'DELETE')">Test</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><span class="method get">GET</span></td>
+                            <td><span class="endpoint">/api/crisis/posts/my_posts/</span></td>
+                            <td class="description">Get my created crisis posts</td>
+                            <td><span class="auth-badge auth-required">Auth Required</span></td>
+                            <td>
+                                <div class="btn-group">
+                                    <button class="copy-btn" onclick="copyEndpoint('/api/crisis/posts/my_posts/')">Copy</button>
+                                    <button class="test-btn" onclick="testEndpoint('/api/crisis/posts/my_posts/', 'GET')">Test</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><span class="method post">POST</span></td>
+                            <td><span class="endpoint">/api/crisis/posts/{id}/approve/</span></td>
+                            <td class="description">Approve crisis post</td>
+                            <td><span class="auth-badge auth-admin">Admin Only</span></td>
+                            <td>
+                                <div class="btn-group">
+                                    <button class="copy-btn" onclick="copyEndpoint('/api/crisis/posts/1/approve/')">Copy</button>
+                                    <button class="test-btn" onclick="testEndpoint('/api/crisis/posts/1/approve/', 'POST')">Test</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><span class="method post">POST</span></td>
+                            <td><span class="endpoint">/api/crisis/posts/{id}/reject/</span></td>
+                            <td class="description">Reject crisis post</td>
+                            <td><span class="auth-badge auth-admin">Admin Only</span></td>
+                            <td>
+                                <div class="btn-group">
+                                    <button class="copy-btn" onclick="copyEndpoint('/api/crisis/posts/1/reject/')">Copy</button>
+                                    <button class="test-btn" onclick="testEndpoint('/api/crisis/posts/1/reject/', 'POST')">Test</button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- VOLUNTEERS APIS -->
+            <div class="section">
+                <h2 class="section-title">Volunteer Management APIs</h2>
+                <table id="volunteerTable">
+                    <thead>
+                        <tr>
+                            <th style="width: 10%">Method</th>
+                            <th style="width: 35%">Endpoint</th>
+                            <th style="width: 30%">Description</th>
+                            <th style="width: 12%">Auth</th>
+                            <th style="width: 13%">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="method post">POST</span></td>
+                            <td><span class="endpoint">/api/volunteers/apply/</span></td>
+                            <td class="description">Apply for volunteer position</td>
+                            <td><span class="auth-badge auth-required">Auth Required</span></td>
+                            <td>
+                                <div class="btn-group">
+                                    <button class="copy-btn" onclick="copyEndpoint('/api/volunteers/apply/')">Copy</button>
+                                    <button class="test-btn" onclick="testEndpoint('/api/volunteers/apply/', 'POST')">Test</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><span class="method get">GET</span></td>
+                            <td><span class="endpoint">/api/volunteers/my-applications/</span></td>
+                            <td class="description">Get my volunteer applications</td>
+                            <td><span class="auth-badge auth-required">Auth Required</span></td>
+                            <td>
+                                <div class="btn-group">
+                                    <button class="copy-btn" onclick="copyEndpoint('/api/volunteers/my-applications/')">Copy</button>
+                                    <button class="test-btn" onclick="testEndpoint('/api/volunteers/my-applications/', 'GET')">Test</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><span class="method get">GET</span></td>
+                            <td><span class="endpoint">/api/volunteers/crisis/{crisis_id}/</span></td>
+                            <td class="description">List volunteers for crisis (owner/admin)</td>
+                            <td><span class="auth-badge auth-required">Auth Required</span></td>
+                            <td>
+                                <div class="btn-group">
+                                    <button class="copy-btn" onclick="copyEndpoint('/api/volunteers/crisis/1/')">Copy</button>
+                                    <button class="test-btn" onclick="testEndpoint('/api/volunteers/crisis/1/', 'GET')">Test</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><span class="method post">POST</span></td>
+                            <td><span class="endpoint">/api/volunteers/{id}/approve/</span></td>
+                            <td class="description">Approve volunteer application</td>
+                            <td><span class="auth-badge auth-required">Auth Required</span></td>
+                            <td>
+                                <div class="btn-group">
+                                    <button class="copy-btn" onclick="copyEndpoint('/api/volunteers/1/approve/')">Copy</button>
+                                    <button class="test-btn" onclick="testEndpoint('/api/volunteers/1/approve/', 'POST')">Test</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><span class="method post">POST</span></td>
+                            <td><span class="endpoint">/api/volunteers/{id}/reject/</span></td>
+                            <td class="description">Reject volunteer application</td>
+                            <td><span class="auth-badge auth-required">Auth Required</span></td>
+                            <td>
+                                <div class="btn-group">
+                                    <button class="copy-btn" onclick="copyEndpoint('/api/volunteers/1/reject/')">Copy</button>
+                                    <button class="test-btn" onclick="testEndpoint('/api/volunteers/1/reject/', 'POST')">Test</button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- DONATIONS APIS -->
+            <div class="section">
+                <h2 class="section-title">Donation Management APIs</h2>
+                <table id="donationTable">
+                    <thead>
+                        <tr>
+                            <th style="width: 10%">Method</th>
+                            <th style="width: 35%">Endpoint</th>
+                            <th style="width: 30%">Description</th>
+                            <th style="width: 12%">Auth</th>
+                            <th style="width: 13%">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="method post">POST</span></td>
+                            <td><span class="endpoint">/api/donations/money/create/</span></td>
+                            <td class="description">Create money donation (anonymous allowed)</td>
+                            <td><span class="auth-badge auth-public">Public</span></td>
+                            <td>
+                                <div class="btn-group">
+                                    <button class="copy-btn" onclick="copyEndpoint('/api/donations/money/create/')">Copy</button>
+                                    <button class="test-btn" onclick="testEndpoint('/api/donations/money/create/', 'POST')">Test</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><span class="method post">POST</span></td>
+                            <td><span class="endpoint">/api/donations/goods/create/</span></td>
+                            <td class="description">Create goods donation (anonymous allowed)</td>
+                            <td><span class="auth-badge auth-public">Public</span></td>
+                            <td>
+                                <div class="btn-group">
+                                    <button class="copy-btn" onclick="copyEndpoint('/api/donations/goods/create/')">Copy</button>
+                                    <button class="test-btn" onclick="testEndpoint('/api/donations/goods/create/', 'POST')">Test</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><span class="method get">GET</span></td>
+                            <td><span class="endpoint">/api/donations/crisis/{id}/money/</span></td>
+                            <td class="description">List money donations for crisis</td>
+                            <td><span class="auth-badge auth-public">Public</span></td>
+                            <td>
+                                <div class="btn-group">
+                                    <button class="copy-btn" onclick="copyEndpoint('/api/donations/crisis/1/money/')">Copy</button>
+                                    <button class="test-btn" onclick="testEndpoint('/api/donations/crisis/1/money/', 'GET')">Test</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><span class="method get">GET</span></td>
+                            <td><span class="endpoint">/api/donations/crisis/{id}/goods/</span></td>
+                            <td class="description">List goods donations for crisis</td>
+                            <td><span class="auth-badge auth-public">Public</span></td>
+                            <td>
+                                <div class="btn-group">
+                                    <button class="copy-btn" onclick="copyEndpoint('/api/donations/crisis/1/goods/')">Copy</button>
+                                    <button class="test-btn" onclick="testEndpoint('/api/donations/crisis/1/goods/', 'GET')">Test</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><span class="method get">GET</span></td>
+                            <td><span class="endpoint">/api/donations/crisis/{id}/summary/</span></td>
+                            <td class="description">Get donation summary (total funds + goods)</td>
+                            <td><span class="auth-badge auth-public">Public</span></td>
+                            <td>
+                                <div class="btn-group">
+                                    <button class="copy-btn" onclick="copyEndpoint('/api/donations/crisis/1/summary/')">Copy</button>
+                                    <button class="test-btn" onclick="testEndpoint('/api/donations/crisis/1/summary/', 'GET')">Test</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><span class="method get">GET</span></td>
+                            <td><span class="endpoint">/api/donations/my-donations/</span></td>
+                            <td class="description">Get my donation history</td>
+                            <td><span class="auth-badge auth-required">Auth Required</span></td>
+                            <td>
+                                <div class="btn-group">
+                                    <button class="copy-btn" onclick="copyEndpoint('/api/donations/my-donations/')">Copy</button>
+                                    <button class="test-btn" onclick="testEndpoint('/api/donations/my-donations/', 'GET')">Test</button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- UPDATES & COMMENTS APIS -->
+            <div class="section">
+                <h2 class="section-title">Crisis Updates & Comments APIs</h2>
+                <table id="updateTable">
+                    <thead>
+                        <tr>
+                            <th style="width: 10%">Method</th>
+                            <th style="width: 35%">Endpoint</th>
+                            <th style="width: 30%">Description</th>
+                            <th style="width: 12%">Auth</th>
+                            <th style="width: 13%">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="method post">POST</span></td>
+                            <td><span class="endpoint">/api/updates/create/</span></td>
+                            <td class="description">Create crisis update (volunteers/owner/admin)</td>
+                            <td><span class="auth-badge auth-required">Auth Required</span></td>
+                            <td>
+                                <div class="btn-group">
+                                    <button class="copy-btn" onclick="copyEndpoint('/api/updates/create/')">Copy</button>
+                                    <button class="test-btn" onclick="testEndpoint('/api/updates/create/', 'POST')">Test</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><span class="method get">GET</span></td>
+                            <td><span class="endpoint">/api/updates/crisis/{crisis_id}/</span></td>
+                            <td class="description">List all updates for crisis (timeline)</td>
+                            <td><span class="auth-badge auth-public">Public</span></td>
+                            <td>
+                                <div class="btn-group">
+                                    <button class="copy-btn" onclick="copyEndpoint('/api/updates/crisis/1/')">Copy</button>
+                                    <button class="test-btn" onclick="testEndpoint('/api/updates/crisis/1/', 'GET')">Test</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><span class="method get">GET</span></td>
+                            <td><span class="endpoint">/api/updates/{id}/</span></td>
+                            <td class="description">Get update details with comments</td>
+                            <td><span class="auth-badge auth-public">Public</span></td>
+                            <td>
+                                <div class="btn-group">
+                                    <button class="copy-btn" onclick="copyEndpoint('/api/updates/1/')">Copy</button>
+                                    <button class="test-btn" onclick="testEndpoint('/api/updates/1/', 'GET')">Test</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><span class="method put">PUT</span></td>
+                            <td><span class="endpoint">/api/updates/{id}/</span></td>
+                            <td class="description">Update crisis update (creator only)</td>
+                            <td><span class="auth-badge auth-required">Auth Required</span></td>
+                            <td>
+                                <div class="btn-group">
+                                    <button class="copy-btn" onclick="copyEndpoint('/api/updates/1/')">Copy</button>
+                                    <button class="test-btn" onclick="testEndpoint('/api/updates/1/', 'PUT')">Test</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><span class="method delete">DELETE</span></td>
+                            <td><span class="endpoint">/api/updates/{id}/</span></td>
+                            <td class="description">Delete crisis update (creator only)</td>
+                            <td><span class="auth-badge auth-required">Auth Required</span></td>
+                            <td>
+                                <div class="btn-group">
+                                    <button class="copy-btn" onclick="copyEndpoint('/api/updates/1/')">Copy</button>
+                                    <button class="test-btn" onclick="testEndpoint('/api/updates/1/', 'DELETE')">Test</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><span class="method get">GET</span></td>
+                            <td><span class="endpoint">/api/updates/my-updates/</span></td>
+                            <td class="description">Get my created updates</td>
+                            <td><span class="auth-badge auth-required">Auth Required</span></td>
+                            <td>
+                                <div class="btn-group">
+                                    <button class="copy-btn" onclick="copyEndpoint('/api/updates/my-updates/')">Copy</button>
+                                    <button class="test-btn" onclick="testEndpoint('/api/updates/my-updates/', 'GET')">Test</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><span class="method post">POST</span></td>
+                            <td><span class="endpoint">/api/updates/comment/create/</span></td>
+                            <td class="description">Add comment to update</td>
+                            <td><span class="auth-badge auth-required">Auth Required</span></td>
+                            <td>
+                                <div class="btn-group">
+                                    <button class="copy-btn" onclick="copyEndpoint('/api/updates/comment/create/')">Copy</button>
+                                    <button class="test-btn" onclick="testEndpoint('/api/updates/comment/create/', 'POST')">Test</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><span class="method get">GET</span></td>
+                            <td><span class="endpoint">/api/updates/{update_id}/comments/</span></td>
+                            <td class="description">List all comments for update</td>
+                            <td><span class="auth-badge auth-public">Public</span></td>
+                            <td>
+                                <div class="btn-group">
+                                    <button class="copy-btn" onclick="copyEndpoint('/api/updates/1/comments/')">Copy</button>
+                                    <button class="test-btn" onclick="testEndpoint('/api/updates/1/comments/', 'GET')">Test</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><span class="method get">GET</span></td>
+                            <td><span class="endpoint">/api/updates/comment/{id}/</span></td>
+                            <td class="description">Get comment details</td>
+                            <td><span class="auth-badge auth-public">Public</span></td>
+                            <td>
+                                <div class="btn-group">
+                                    <button class="copy-btn" onclick="copyEndpoint('/api/updates/comment/1/')">Copy</button>
+                                    <button class="test-btn" onclick="testEndpoint('/api/updates/comment/1/', 'GET')">Test</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><span class="method put">PUT</span></td>
+                            <td><span class="endpoint">/api/updates/comment/{id}/</span></td>
+                            <td class="description">Edit comment (owner only)</td>
+                            <td><span class="auth-badge auth-required">Auth Required</span></td>
+                            <td>
+                                <div class="btn-group">
+                                    <button class="copy-btn" onclick="copyEndpoint('/api/updates/comment/1/')">Copy</button>
+                                    <button class="test-btn" onclick="testEndpoint('/api/updates/comment/1/', 'PUT')">Test</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><span class="method delete">DELETE</span></td>
+                            <td><span class="endpoint">/api/updates/comment/{id}/</span></td>
+                            <td class="description">Delete comment (owner only)</td>
+                            <td><span class="auth-badge auth-required">Auth Required</span></td>
+                            <td>
+                                <div class="btn-group">
+                                    <button class="copy-btn" onclick="copyEndpoint('/api/updates/comment/1/')">Copy</button>
+                                    <button class="test-btn" onclick="testEndpoint('/api/updates/comment/1/', 'DELETE')">Test</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><span class="method get">GET</span></td>
+                            <td><span class="endpoint">/api/updates/my-comments/</span></td>
+                            <td class="description">Get my comments</td>
+                            <td><span class="auth-badge auth-required">Auth Required</span></td>
+                            <td>
+                                <div class="btn-group">
+                                    <button class="copy-btn" onclick="copyEndpoint('/api/updates/my-comments/')">Copy</button>
+                                    <button class="test-btn" onclick="testEndpoint('/api/updates/my-comments/', 'GET')">Test</button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="toast" id="toast">Copied to clipboard!</div>
+
+    <script>
+        const BASE_URL = 'http://127.0.0.1:8000';
+
+        // Copy endpoint to clipboard
+        function copyEndpoint(endpoint) {
+            const fullUrl = BASE_URL + endpoint;
+            navigator.clipboard.writeText(fullUrl).then(() => {
+                showToast('Endpoint copied: ' + fullUrl);
+            });
+        }
+
+        // Copy text by element ID
+        function copyText(elementId) {
+            const text = document.getElementById(elementId).textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('Copied: ' + text);
+            });
+        }
+
+        // Show toast notification
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.style.display = 'block';
+            
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
+        }
+
+        // Test endpoint - opens in new tab
+        function testEndpoint(endpoint, method) {
+            const fullUrl = BASE_URL + endpoint;
+            
+            if (method === 'GET') {
+                window.open(fullUrl, '_blank');
+            } else {
+                showToast('Testing ' + method + ' request to: ' + fullUrl);
+                console.log('Test URL:', fullUrl);
+                console.log('Method:', method);
+                alert('For ' + method + ' requests, use Postman or cURL.\n\nURL: ' + fullUrl + '\nMethod: ' + method);
+            }
+        }
+
+        // Search API
+        function searchAPI() {
+            const input = document.getElementById('searchInput').value.toLowerCase();
+            const tables = document.querySelectorAll('table tbody');
+            
+            tables.forEach(table => {
+                const rows = table.getElementsByTagName('tr');
+                
+                for (let row of rows) {
+                    const method = row.cells[0]?.textContent.toLowerCase() || '';
+                    const endpoint = row.cells[1]?.textContent.toLowerCase() || '';
+                    const description = row.cells[2]?.textContent.toLowerCase() || '';
+                    
+                    if (method.includes(input) || endpoint.includes(input) || description.includes(input)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                }
+            });
+        }
+
+        // Count total endpoints
+        window.onload = function() {
+            const allRows = document.querySelectorAll('table tbody tr');
+            document.getElementById('totalEndpoints').textContent = allRows.length;
+        };
+    </script>
+</body>
+</html>
+
