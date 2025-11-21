@@ -106,23 +106,13 @@ TEMPLATES = [
 
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
-        'APP': {
-            'client_id': env("GOOGLE_CLIENT_ID"),
-            'secret': env("GOOGLE_CLIENT_SECRET"),
-        },
-        'SCOPE': ['profile','email',],
-         'AUTH_PARAMS': {'access_type': 'online'},
+        'SCOPE': ['profile', 'email'],
+        'AUTH_PARAMS': {'access_type': 'online'},
         'METHOD': 'oauth2',
         'VERIFIED_EMAIL': True,
     },
-    'github': {
-        'APP': {
-            'client_id': env("GITHUB_CLIENT_ID"),
-            'secret': env("GITHUB_CLIENT_SECRET"),
-        }
-    }
-   
 }
+
 
 SOCIALACCOUNT_LOGIN_ON_GET=True
 LOGIN_REDIRECT_URL = 'success'
@@ -206,8 +196,9 @@ AUTHENTICATION_BACKENDS = [
 SITE_ID = 1
 
 # Redirects
-LOGIN_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = '/'  # Your frontend URL
 LOGOUT_REDIRECT_URL = '/'
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 # Login methods (instead of ACCOUNT_AUTHENTICATION_METHOD)
 ACCOUNT_LOGIN_METHODS = {"email", "username"}  # allow both
