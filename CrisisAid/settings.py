@@ -196,9 +196,11 @@ AUTHENTICATION_BACKENDS = [
 SITE_ID = 1
 
 # Redirects
-LOGIN_REDIRECT_URL = '/'  # Your frontend URL
-LOGOUT_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = 'http://localhost:5173'
+LOGOUT_REDIRECT_URL = 'http://localhost:5173'
+ACCOUNT_LOGOUT_REDIRECT_URL = 'http://localhost:5173'
 ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+
 
 # Login methods (instead of ACCOUNT_AUTHENTICATION_METHOD)
 ACCOUNT_LOGIN_METHODS = {"email", "username"}  # allow both
