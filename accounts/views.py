@@ -1,4 +1,5 @@
-from rest_framework import generics
+from rest_framework import generics, permissions
+from rest_framework.permissions import AllowAny
 from .serializers import RegisterSerializer, UserSerializer
 from django.contrib.auth import get_user_model
 from .permissions import IsOwner, IsAuthenticatedOrCreateOnly
@@ -15,21 +16,19 @@ User = get_user_model()
 class RegisterView(generics.CreateAPIView):
     """
     User registration endpoint.
-    Allows unauthenticated users to create an account.
     """
     queryset = User.objects.all()
     serializer_class = RegisterSerializer
-    permission_classes = [IsAuthenticatedOrCreateOnly]
+    permission_classes = [AllowAny]
 
 
 # ------------------- User Profile -------------------
 class ProfileView(generics.RetrieveUpdateAPIView):
     """
     Retrieve or update logged-in user's profile.
-    Only the owner can access/update their profile.
     """
     serializer_class = UserSerializer
-    permission_classes = [IsOwner]
+    permission_classes = [permissions.IsAuthenticated, IsOwner]
 
     def get_object(self):
         return self.request.user
@@ -39,10 +38,10 @@ class ProfileView(generics.RetrieveUpdateAPIView):
 class GoogleLogin(SocialLoginView):
     """Google OAuth2 login"""
     adapter_class = GoogleOAuth2Adapter
-    permission_classes = [IsAuthenticatedOrCreateOnly]
+    permission_classes = [AllowAny]  # Changed - Allow anyone
 
 
 class GitHubLogin(SocialLoginView):
     """GitHub OAuth2 login"""
     adapter_class = GitHubOAuth2Adapter
-    permission_classes = [IsAuthenticatedOrCreateOnly]
+    permission_classes = [AllowAny]  # Changed - Allow anyone
