@@ -111,6 +111,11 @@ SOCIALACCOUNT_PROVIDERS = {
         'METHOD': 'oauth2',
         'VERIFIED_EMAIL': True,
     },
+    "github": {
+        "SCOPE": ["user:email"],
+        "METHOD": "oauth2",
+        "VERIFIED_EMAIL": True,
+    }
 }
 
 
@@ -196,7 +201,7 @@ AUTHENTICATION_BACKENDS = [
 SITE_ID = 1
 
 # Redirects
-LOGIN_REDIRECT_URL = 'http://localhost:5173'
+LOGIN_REDIRECT_URL = '/api/accounts/social-redirect/'
 LOGOUT_REDIRECT_URL = 'http://localhost:5173'
 ACCOUNT_LOGOUT_REDIRECT_URL = 'http://localhost:5173'
 ALLOWED_HOSTS = ['localhost', '127.0.0.1']
@@ -217,7 +222,7 @@ ACCOUNT_RATE_LIMITS = {
 
 ACCOUNT_ADAPTER = "accounts.adapter.CustomAccountAdapter"
 SOCIALACCOUNT_ADAPTER = "accounts.adapter.CustomSocialAccountAdapter"
-FRONTEND_URL = "http://localhost:3000"  # React frontend
+FRONTEND_URL = "http://localhost:5173"  # React frontend
 
 # Email backend config (using Gmail App Password in .env)
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
