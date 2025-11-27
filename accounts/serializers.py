@@ -60,3 +60,66 @@ class UserSerializer(serializers.ModelSerializer):
             "id", "email", "first_name", "last_name", "phone",
             "profile_picture", "facebook_account", "location", "occupation"
         ]
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    # Add a field to check if user logged in via social auth
+    is_social_user = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = User
+        fields = [
+            'id', 
+            'username', 
+            'email', 
+            'phone', 
+            'profile_picture', 
+            'facebook_account', 
+            'location', 
+            'occupation',
+            'role',
+            'date_joined',
+            'is_social_user'
+        ]
+        read_only_fields = ['id', 'date_joined', 'role']
+    
+    def get_is_social_user(self, obj):
+        """Check if user has social account"""
+        return obj.socialaccount_set.exists()
+    
+    def validate_username(self, value):
+        """Prevent username change for social auth users"""
+        if self.instance and self.instance.socialaccount_set.exists():
+            if value != self.instance.username:
+                raise serializers.ValidationError(
+                    "Cannot change username for social login accounts."
+                )
+        return value
+    
+    def validate_email(self, value):
+        """Prevent email change for social auth users"""
+        if self.instance and self.instance.socialaccount_set.exists():
+            if value != self.instance.email:
+                raise serializers.ValidationError(
+                    "Cannot change email for social login accounts."
+                )
+        return value
+    
+    def update(self, instance, validated_data):
+        """Update user profile with proper handling of profile picture"""
+        # Handle profile picture upload
+        profile_picture = validated_data.pop('profile_picture', None)
+        if profile_picture:
+            # Delete old profile picture if exists
+            if instance.profile_picture:
+                try:
+                    instance.profile_picture.delete(save=False)
+                except:
+                    pass
+            instance.profile_picture = profile_picture
+        
+        # Update other fields
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        
+        instance.save()
+        return instance

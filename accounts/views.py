@@ -1,8 +1,13 @@
 from rest_framework import generics, permissions
 from rest_framework.permissions import AllowAny
-from .serializers import RegisterSerializer, UserSerializer
+from .serializers import RegisterSerializer, UserSerializer, UserProfileSerializer
 from django.contrib.auth import get_user_model
 from .permissions import IsOwner, IsAuthenticatedOrCreateOnly
+from rest_framework import status
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.parsers import MultiPartParser, FormParser
 
 # Social login imports
 from dj_rest_auth.registration.views import SocialLoginView
@@ -23,15 +28,42 @@ class RegisterView(generics.CreateAPIView):
 
 
 # ------------------- User Profile -------------------
-class ProfileView(generics.RetrieveUpdateAPIView):
+class UserProfileView(APIView):
     """
-    Retrieve or update logged-in user's profile.
+    Get and update user profile.
+    Supports file uploads for profile picture.
     """
-    serializer_class = UserSerializer
-    permission_classes = [permissions.IsAuthenticated, IsOwner]
-
-    def get_object(self):
-        return self.request.user
+    permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser]  # Support file uploads
+    
+    def get(self, request):
+        """Get user profile"""
+        serializer = UserProfileSerializer(request.user)
+        return Response(serializer.data)
+    
+    def put(self, request):
+        """Update user profile"""
+        serializer = UserProfileSerializer(
+            request.user, 
+            data=request.data, 
+            partial=True
+        )
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def patch(self, request):
+        """Partial update user profile"""
+        serializer = UserProfileSerializer(
+            request.user, 
+            data=request.data, 
+            partial=True
+        )
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 # ------------------- Social Login -------------------

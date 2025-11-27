@@ -213,7 +213,7 @@ ACCOUNT_SIGNUP_FIELDS = ["email*", "username*", "password1*", "password2*"]
 
 # Mandatory verification
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"
-SOCIALACCOUNT_EMAIL_VERIFICATION = "mandatory"
+SOCIALACCOUNT_EMAIL_VERIFICATION = "none"
 
 # Rate limiting (instead of ACCOUNT_LOGIN_ATTEMPTS_LIMIT)
 ACCOUNT_RATE_LIMITS = {
