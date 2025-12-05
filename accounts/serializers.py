@@ -1,4 +1,3 @@
-# accounts/serializers.py
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from allauth.account.adapter import get_adapter
@@ -25,7 +24,7 @@ class RegisterSerializer(serializers.ModelSerializer):
             "facebook_account",
             "location",
             "occupation",
-            "role",  # include role
+            "role",  
         ]
 
     def validate(self, data):

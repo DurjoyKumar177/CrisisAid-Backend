@@ -1,4 +1,3 @@
-# accounts/urls.py
 from django.urls import path,include
 from .views import RegisterView, GoogleLogin, GitHubLogin
 from . import views
